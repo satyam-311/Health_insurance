@@ -1,26 +1,28 @@
-Health Insurance Cost Prediction API
+# Health Insurance Cost Prediction API
 
-A production-ready Machine Learning API built with FastAPI, containerized using Docker, and automated with CI/CD via GitHub Actions.
+A production-ready Machine Learning API built with FastAPI, containerized using Docker, and automated using CI/CD via GitHub Actions.
 
-This project predicts health insurance expenses based on user inputs such as age, BMI, smoking status, region, and number of children.
+This service predicts health insurance expenses based on user inputs such as age, BMI, smoking status, region, and number of children.
 
-Overview
+---
 
-This application exposes a REST API that serves predictions from a trained scikit-learn model. The project follows production-oriented practices including:
+## Overview
 
-Modular project structure
+This application exposes a REST API that serves predictions from a trained scikit-learn model.  
+The project follows production-oriented practices including:
 
-Automated testing with pytest
+- Modular architecture
+- Automated testing with pytest
+- Continuous Integration
+- Continuous Deployment to Docker Hub
+- Lazy model loading for runtime stability
+- Dockerized deployment
 
-Continuous Integration
+---
 
-Continuous Deployment to Docker Hub
+## Project Structure
 
-Lazy model loading for runtime stability
-
-Dockerized deployment
-
-Project Structure
+```
 Health_insurance/
 │
 ├── src/
@@ -43,10 +45,17 @@ Health_insurance/
 ├── .github/workflows/
 │   ├── ci.yml
 │   └── cd.yml
+```
 
-API Endpoint
-POST /predict
-Request Body
+---
+
+## API Endpoint
+
+### POST `/predict`
+
+### Request Body
+
+```json
 {
   "age": 30,
   "sex": "male",
@@ -55,128 +64,149 @@ Request Body
   "smoker": "no",
   "region": "southwest"
 }
+```
 
-Response
+### Response
+
+```json
 {
   "predicted_expenses": 3456.78
 }
+```
 
+Interactive API documentation:
 
-Interactive API documentation is available at:
-
+```
 http://127.0.0.1:8000/docs
+```
 
-Running Locally
-1. Create Virtual Environment
+---
+
+## Running Locally
+
+### 1. Create Virtual Environment
+
+```bash
 python -m venv venv
-
+```
 
 Activate:
 
-Windows:
-
+**Windows**
+```bash
 venv\Scripts\activate
+```
 
-
-Mac/Linux:
-
+**Mac/Linux**
+```bash
 source venv/bin/activate
+```
 
-2. Install Dependencies
+### 2. Install Dependencies
+
+```bash
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
+```
 
-3. Run the API
+### 3. Run the API
+
+```bash
 uvicorn src.api.main:app --reload
+```
 
-Running with Docker
-Build Image
+---
+
+## Running with Docker
+
+### Build Image
+
+```bash
 docker build -t health-insurance-api .
+```
 
-Run Container
+### Run Container
+
+```bash
 docker run -p 8000:8000 health-insurance-api
+```
 
-Testing
+---
 
-Run tests locally:
+## Running Tests
 
+```bash
 pytest
+```
 
+Tests are automatically executed in the CI pipeline on every push to the `main` branch.
 
-The CI pipeline automatically runs tests on every push to the main branch.
+---
 
-CI/CD Pipeline
-Continuous Integration
+## CI/CD Pipeline
 
-Installs dependencies
+### Continuous Integration
 
-Runs unit tests
+- Installs dependencies
+- Runs unit tests
+- Builds Docker image
 
-Builds Docker image
+### Continuous Deployment
 
-Continuous Deployment
+- Builds Docker image
+- Pushes image to Docker Hub
 
-Builds Docker image
+Configured GitHub Secrets:
 
-Pushes image to Docker Hub
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
 
-Secrets configured in GitHub:
+---
 
-DOCKERHUB_USERNAME
-
-DOCKERHUB_TOKEN
-
-Model Training
+## Model Training
 
 To retrain the model:
 
+```bash
 python -m src.models.train
-
+```
 
 The model is loaded lazily at runtime to prevent import-time failures during CI execution.
 
-Production Considerations
+---
 
-Lazy model initialization
+## Production Considerations
 
-Dockerized environment
+- Lazy model initialization
+- Docker-based isolation
+- Automated validation through tests
+- Secure secret management
+- Ready for cloud deployment
 
-Isolated dependency management
+---
 
-Automated validation via tests
-
-Secure secret handling in GitHub Actions
-
-Docker Hub
+## Docker Hub
 
 Pull the production image:
 
+```bash
 docker pull <your-dockerhub-username>/health-insurance-api
+```
 
-Tech Stack
+---
 
-Python 3.11
+## Tech Stack
 
-FastAPI
+- Python 3.11
+- FastAPI
+- scikit-learn
+- MLflow
+- Docker
+- GitHub Actions
+- pytest
 
-scikit-learn
+---
 
-MLflow
+## License
 
-Docker
-
-GitHub Actions
-
-pytest
-
-If you want, next we can tighten this further with:
-
-API versioning
-
-Health check endpoint
-
-Logging middleware
-
-Production Docker optimizations
-
-Now it looks clean and serious.
+MIT License
