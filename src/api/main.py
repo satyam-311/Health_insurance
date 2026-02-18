@@ -1,19 +1,24 @@
 from fastapi import FastAPI
-from src.models.predict import ModelPredictor
 from src.api.schema import InsuranceRequest
+from src.models.predict import ModelPredictor
 
-app = FastAPI(title="Health Insurance Expense Prediction API")
+app = FastAPI()
 
-predictor = ModelPredictor()
+predictor = None
 
 
-@app.get("/")
-def health_check():
-    return {"status": "API is running"}
+def get_predictor():
+    global predictor
+    if predictor is None:
+        predictor = ModelPredictor()
+    return predictor
 
 
 @app.post("/predict")
 def predict(request: InsuranceRequest):
+    model = get_predictor()
     input_data = request.model_dump()
-    prediction = predictor.predict(input_data)
+    prediction = model.predict(input_data)
+
     return {"predicted_expenses": prediction}
+
