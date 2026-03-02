@@ -1,10 +1,17 @@
-import mlflow
-import mlflow.sklearn
 import joblib
 from sklearn.metrics import mean_squared_error, r2_score
 from xgboost import XGBRegressor
 from sklearn.pipeline import Pipeline
 from pathlib import Path
+from contextlib import nullcontext
+
+try:
+    import mlflow
+    import mlflow.sklearn
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    mlflow = None
+    MLFLOW_AVAILABLE = False
 
 from src.logger import logger
 from src.config import Config
@@ -17,6 +24,7 @@ class ModelTrainer:
     def __init__(self):
         self.config = Config()
         self.model_params = self.config.get("model")
+        self.mlflow_enabled = bool((self.config.get("mlflow") or {}).get("enabled", False))
         self.model_save_path = Path(self.config.get("paths")["model_save_path"])
 
     def train(self):
@@ -35,7 +43,9 @@ class ModelTrainer:
             n_estimators=self.model_params["n_estimators"],
             learning_rate=self.model_params["learning_rate"],
             max_depth=self.model_params["max_depth"],
-            random_state=self.model_params["random_state"]
+            random_state=self.model_params["random_state"],
+            n_jobs=self.model_params.get("n_jobs", -1),
+            tree_method=self.model_params.get("tree_method", "hist")
         )
 
         pipeline = Pipeline(
@@ -45,9 +55,15 @@ class ModelTrainer:
             ]
         )
 
-        mlflow.set_experiment("insurance_expense_prediction")
+        if MLFLOW_AVAILABLE and self.mlflow_enabled:
+            mlflow.set_experiment("insurance_expense_prediction")
+            run_context = mlflow.start_run()
+        else:
+            if self.mlflow_enabled and not MLFLOW_AVAILABLE:
+                logger.warning("MLflow is enabled in config but not installed. Training will continue without experiment logging.")
+            run_context = nullcontext()
 
-        with mlflow.start_run():
+        with run_context:
             pipeline.fit(X_train, y_train)
 
             predictions = pipeline.predict(X_test)
@@ -57,11 +73,11 @@ class ModelTrainer:
 
             r2 = r2_score(y_test, predictions)
 
-            mlflow.log_params(self.model_params)
-            mlflow.log_metric("rmse", rmse)
-            mlflow.log_metric("r2_score", r2)
-
-            mlflow.sklearn.log_model(pipeline, "model")
+            if MLFLOW_AVAILABLE and self.mlflow_enabled:
+                mlflow.log_params(self.model_params)
+                mlflow.log_metric("rmse", rmse)
+                mlflow.log_metric("r2_score", r2)
+                mlflow.sklearn.log_model(pipeline, "model")
 
             logger.info(f"RMSE: {rmse}")
             logger.info(f"R2 Score: {r2}")
@@ -72,3 +88,8 @@ class ModelTrainer:
             logger.info(f"Model saved at {self.model_save_path}")
 
         return rmse, r2
+
+
+if __name__ == "__main__":
+    trainer = ModelTrainer()
+    trainer.train()

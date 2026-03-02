@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insurance Pricing Console</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="noise"></div>
+
+  <main class="layout">
+    <section class="card intro">
+      <p class="kicker">Pricing Intelligence</p>
+      <h1>Health Insurance Quote Estimator</h1>
+      <p class="lead">
+        Simple prediction form connected to your FastAPI `/predict` endpoint.
+      </p>
+      <div class="health-row">
+        <span class="label">Model Status</span>
+        <span id="model-status" class="pill neutral">Checking...</span>
+      </div>
+      <div class="health-row">
+        <span class="label">Expected Fields</span>
+        <span id="model-fields" class="fields">-</span>
+      </div>
+    </section>
+
+    <section class="card form-card">
+      <h2>Applicant Profile</h2>
+      <form id="predict-form" novalidate>
+        <div class="grid">
+          <label>
+            Age
+            <input type="number" id="age" name="age" min="18" max="100" value="30" required />
+          </label>
+
+          <label>
+            BMI
+            <input type="number" id="bmi" name="bmi" min="10" max="60" step="0.1" value="27.5" required />
+          </label>
+
+          <label>
+            Children
+            <input type="number" id="children" name="children" min="0" max="10" value="1" required />
+          </label>
+
+          <label>
+            Gender
+            <select id="gender" name="gender" required>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </label>
+
+          <label>
+            Discount Eligibility
+            <select id="discount_eligibility" name="discount_eligibility" required>
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </label>
+
+          <label>
+            Region
+            <select id="region" name="region" required>
+              <option value="southwest">Southwest</option>
+              <option value="southeast">Southeast</option>
+              <option value="northwest">Northwest</option>
+              <option value="northeast">Northeast</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="submit-btn" type="submit">Estimate Premium</button>
+      </form>
+
+      <div id="result" class="result hidden" aria-live="polite">
+        <p>Predicted annual expense</p>
+        <h3 id="result-value">$0.00</h3>
+      </div>
+
+      <p id="error" class="error hidden"></p>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

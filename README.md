@@ -58,13 +58,15 @@ Health_insurance/
 ```json
 {
   "age": 30,
-  "sex": "male",
+  "gender": "male",
   "bmi": 25.5,
   "children": 1,
-  "smoker": "no",
+  "discount_eligibility": "no",
   "region": "southwest"
 }
 ```
+
+Legacy payloads with `sex` / `smoker` are also accepted for backward compatibility.
 
 ### Response
 
@@ -78,6 +80,12 @@ Interactive API documentation:
 
 ```
 http://127.0.0.1:8000/docs
+```
+
+Frontend UI:
+
+```
+http://127.0.0.1:8000/
 ```
 
 ---
@@ -172,6 +180,14 @@ python -m src.models.train
 ```
 
 The model is loaded lazily at runtime to prevent import-time failures during CI execution.
+
+If you uploaded a previously trained model and predictions fail, call:
+
+```bash
+curl http://127.0.0.1:8000/model-info
+```
+
+This returns the model's expected input columns so you can confirm schema compatibility without retraining.
 
 ---
 
